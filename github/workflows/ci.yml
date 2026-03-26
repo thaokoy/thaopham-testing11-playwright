@@ -38,9 +38,36 @@ jobs:
       # B4.1: Tạo file .env để lưu thông tin đăng nhập (nếu cần)
       - name: Create .env file
         run: |
-          echo "USERNAME={{ secrets.USERNAME }}" >> .env
-          echo "PASSWORD={{ secrets.PASSWORD }}" >> .env
-
+          echo "USERNAME=${{secrets.USERNAME}}" >> .env
+          echo "PASSWORD=${{secrets.PASSWORD}}" >> .env
       # B5: chạy test bằng Playwright
       - name: Run Playwright tests
         run: npx playwright test --project=chromium
+      
+      # B6: Tạo báo cáo allure (nếu có)
+      - name: Generate Allure report
+        if: always() # luôn chạy bước này dù test có pass hay fail
+        run: |
+          # kiểm tra folder allure-results có tồn tại không
+          if [ -d "allure-results" ]; then
+            # nếu có thì tạo báo cáo allure
+            npm run -s allure:generate || true # bỏ qua lỗi nếu có
+          else
+            echo "No allure-results folder found, skipping report generation."
+          fi
+
+      # B7: Upload báo cáo allure lên GitHub Actions (nếu có)
+      - name: Upload Allure report
+        if: always() # luôn upload dù test có pass hay fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-allure-report
+          if-no-files-found: warn
+          # liệt kê tất cả file cần upload
+          path: |
+            playwright-report/
+            allure-results/
+            allure-report/
+            test-results/
+
+      # B8: gửi report qua slack
