@@ -11,7 +11,8 @@
     "test:home": "playwright test home --project=chromium --headed",
     "test:myinfo": "playwright test myinfo --project=chromium --headed",
     "test:admin": "playwright test admin --project=chromium --headed",
-    "test:getbyrole": "playwright test getbyrole --project=chromium --headed"
+    "test:getbyrole": "playwright test getbyrole --project=chromium --headed",
+    "test:simpleapi": "playwright test apiSimple --project=chromium --headed"
   },
   "repository": {
     "type": "git",
